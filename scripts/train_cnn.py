@@ -5,7 +5,14 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    classification_report
+)
 
 # =========================
 # Configuration
@@ -177,9 +184,95 @@ def train_model(model, train_loader, val_loader):
     return best_model_path, best_val_acc, training_time
 
 
+def evaluate_test_set(model, test_loader):
+    model.eval()
+
+    all_predictions = []
+    all_labels = []
+    if DEVICE == "mps":
+        torch.mps.synchronize()
+    elif DEVICE == "cuda":
+        torch.cuda.synchronize()
+    start_time = time.time()
+
+    with torch.no_grad():
+        for X_batch, y_batch in test_loader:
+            X_batch = X_batch.to(DEVICE)
+            y_batch = y_batch.to(DEVICE)
+
+            outputs = model(X_batch)
+            predictions = outputs.argmax(dim=1)
+
+            all_predictions.extend(
+                predictions.cpu().numpy()
+            )
+
+            all_labels.extend(
+                y_batch.cpu().numpy()
+            )
+
+    # Synchronize MPS before stopping timer
+    if DEVICE == "mps":
+        torch.mps.synchronize()
+    elif DEVICE == "cuda":
+        torch.cuda.synchronize()
+
+    total_inference_time = time.time() - start_time
+
+    all_predictions = np.array(all_predictions)
+    all_labels = np.array(all_labels)
+
+    accuracy = accuracy_score(
+        all_labels,
+        all_predictions
+    )
+
+    precision = precision_score(
+        all_labels,
+        all_predictions,
+        average="macro",
+        zero_division=0
+    )
+
+    recall = recall_score(
+        all_labels,
+        all_predictions,
+        average="macro",
+        zero_division=0
+    )
+
+    f1 = f1_score(
+        all_labels,
+        all_predictions,
+        average="macro",
+        zero_division=0
+    )
+
+    cm = confusion_matrix(
+        all_labels,
+        all_predictions
+    )
+
+    average_inference_time = (
+        total_inference_time / len(all_labels)
+    )
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "confusion_matrix": cm,
+        "inference_time": average_inference_time,
+        "y_true": all_labels,
+        "y_pred": all_predictions
+    }
+
 # =========================
 # Main
 # =========================
+
+
 def main():
 
     set_seed(SEED)
@@ -257,6 +350,64 @@ def main():
     print(f"Best validation accuracy: {best_val_acc:.4f}")
     print(f"Training time: {training_time:.2f} seconds")
     print(f"Best model saved to: {best_model_path}")
+    # =========================
+    # Final Test Evaluation
+    # =========================
+
+    print("\nEvaluating best model on test set...")
+
+    model.load_state_dict(
+        torch.load(
+            best_model_path,
+            map_location=DEVICE
+        )
+    )
+
+    test_results = evaluate_test_set(
+        model,
+        test_loader
+    )
+
+    print("\n===== Test Results =====")
+    print(
+        f"Accuracy        : "
+        f"{test_results['accuracy']:.4f}"
+    )
+    print(
+        f"Macro Precision : "
+        f"{test_results['precision']:.4f}"
+    )
+    print(
+        f"Macro Recall    : "
+        f"{test_results['recall']:.4f}"
+    )
+    print(
+        f"Macro F1        : "
+        f"{test_results['f1']:.4f}"
+    )
+    print(
+        f"Inference Time  : "
+        f"{test_results['inference_time'] * 1000:.4f} ms/sample"
+    )
+
+    print("\nConfusion Matrix:")
+    print(test_results["confusion_matrix"])
+
+    print("\nClassification Report:")
+
+    print(
+        classification_report(
+            test_results["y_true"],
+            test_results["y_pred"],
+            target_names=[
+                "Normal",
+                "Ball",
+                "Inner Race",
+                "Outer Race"
+            ],
+            digits=4
+        )
+    )
 
 
 if __name__ == "__main__":
