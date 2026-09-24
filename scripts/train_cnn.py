@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import os
 import time
 import random
@@ -408,6 +409,84 @@ def main():
             digits=4
         )
     )
+    # =========================
+    # Save Results
+    # =========================
+
+    os.makedirs(RESULT_DIR, exist_ok=True)
+
+    # Save metrics
+    metrics_path = os.path.join(
+        RESULT_DIR,
+        "metrics.txt"
+    )
+
+    with open(metrics_path, "w") as f:
+        f.write("1D-CNN Preliminary Results\n")
+        f.write("==========================\n")
+        f.write(f"Test Accuracy: {test_results['accuracy']:.6f}\n")
+        f.write(f"Macro Precision: {test_results['precision']:.6f}\n")
+        f.write(f"Macro Recall: {test_results['recall']:.6f}\n")
+        f.write(f"Macro F1: {test_results['f1']:.6f}\n")
+        f.write(f"Best Validation Accuracy: {best_val_acc:.6f}\n")
+        f.write(f"Training Time: {training_time:.2f} seconds\n")
+        f.write(
+            f"Inference Time: "
+            f"{test_results['inference_time'] * 1000:.4f} ms/sample\n"
+        )
+        f.write(f"Total Parameters: {total_params}\n")
+
+    # Save confusion matrix
+    cm = test_results["confusion_matrix"]
+
+    class_names = [
+        "Normal",
+        "Ball",
+        "Inner Race",
+        "Outer Race"
+    ]
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    image = ax.imshow(cm)
+
+    ax.set_xticks(range(NUM_CLASSES))
+    ax.set_yticks(range(NUM_CLASSES))
+
+    ax.set_xticklabels(class_names)
+    ax.set_yticklabels(class_names)
+
+    ax.set_xlabel("Predicted Label")
+    ax.set_ylabel("True Label")
+    ax.set_title("1D-CNN Confusion Matrix")
+
+    for i in range(NUM_CLASSES):
+        for j in range(NUM_CLASSES):
+            ax.text(
+                j,
+                i,
+                str(cm[i, j]),
+                ha="center",
+                va="center"
+            )
+
+    fig.colorbar(image)
+    plt.tight_layout()
+
+    confusion_matrix_path = os.path.join(
+        RESULT_DIR,
+        "confusion_matrix.png"
+    )
+
+    plt.savefig(
+        confusion_matrix_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.close()
+
+    print(f"\nResults saved to: {RESULT_DIR}")
 
 
 if __name__ == "__main__":
