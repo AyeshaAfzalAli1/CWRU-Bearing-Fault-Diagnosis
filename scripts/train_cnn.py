@@ -1,15 +1,26 @@
+import os
+import time
 import random
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
+from sklearn.metrics import accuracy_score
 
 # =========================
 # Configuration
 # =========================
 SEED = 42
+EPOCHS = 30
 BATCH_SIZE = 64
+LEARNING_RATE = 1e-3
 NUM_CLASSES = 4
+
+RESULT_DIR = os.path.join("results", "cnn")
+MODEL_DIR = os.path.join("models", "cnn")
+
+os.makedirs(RESULT_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 if torch.backends.mps.is_available():
     DEVICE = "mps"
@@ -40,7 +51,6 @@ class BearingDataset(Dataset):
         return len(self.X)
 
     def __getitem__(self, idx):
-        # Convert a 1024-point signal to shape [1, 1024]
         return self.X[idx].unsqueeze(0), self.y[idx]
 
 
@@ -52,21 +62,11 @@ class CNN1D(nn.Module):
         super().__init__()
 
         self.features = nn.Sequential(
-            nn.Conv1d(
-                in_channels=1,
-                out_channels=16,
-                kernel_size=7,
-                padding=3
-            ),
+            nn.Conv1d(1, 16, kernel_size=7, padding=3),
             nn.ReLU(),
             nn.MaxPool1d(2),
 
-            nn.Conv1d(
-                in_channels=16,
-                out_channels=32,
-                kernel_size=5,
-                padding=2
-            ),
+            nn.Conv1d(16, 32, kernel_size=5, padding=2),
             nn.ReLU(),
             nn.MaxPool1d(2)
         )
@@ -81,12 +81,104 @@ class CNN1D(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        x = self.classifier(x)
-        return x
+        return self.classifier(x)
 
 
 # =========================
-# Test Model and Data
+# Evaluation
+# =========================
+def evaluate(model, loader):
+    model.eval()
+
+    predictions = []
+    labels = []
+
+    with torch.no_grad():
+        for X_batch, y_batch in loader:
+            X_batch = X_batch.to(DEVICE)
+            y_batch = y_batch.to(DEVICE)
+
+            outputs = model(X_batch)
+            predicted = outputs.argmax(dim=1)
+
+            predictions.extend(predicted.cpu().numpy())
+            labels.extend(y_batch.cpu().numpy())
+
+    return accuracy_score(labels, predictions)
+
+
+# =========================
+# Training
+# =========================
+def train_model(model, train_loader, val_loader):
+    criterion = nn.CrossEntropyLoss()
+
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=LEARNING_RATE
+    )
+
+    best_val_acc = 0.0
+
+    best_model_path = os.path.join(
+        MODEL_DIR,
+        "best_cnn_model.pth"
+    )
+
+    training_start = time.time()
+
+    for epoch in range(EPOCHS):
+
+        model.train()
+
+        running_loss = 0.0
+
+        for X_batch, y_batch in train_loader:
+
+            X_batch = X_batch.to(DEVICE)
+            y_batch = y_batch.to(DEVICE)
+
+            optimizer.zero_grad()
+
+            outputs = model(X_batch)
+
+            loss = criterion(outputs, y_batch)
+
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        average_loss = running_loss / len(train_loader)
+
+        val_acc = evaluate(
+            model,
+            val_loader
+        )
+
+        print(
+            f"Epoch [{epoch + 1:02d}/{EPOCHS}] "
+            f"| Loss: {average_loss:.4f} "
+            f"| Val Acc: {val_acc:.4f}"
+        )
+
+        # Save model only when validation performance improves
+        if val_acc > best_val_acc:
+
+            best_val_acc = val_acc
+
+            torch.save(
+                model.state_dict(),
+                best_model_path
+            )
+
+    training_time = time.time() - training_start
+
+    return best_model_path, best_val_acc, training_time
+
+
+# =========================
+# Main
 # =========================
 def main():
 
@@ -94,40 +186,77 @@ def main():
 
     print(f"Using device: {DEVICE}")
 
-    # Load common training split
+    # Load common dataset splits
     X_train = np.load("data/splits/X_train.npy")
     y_train = np.load("data/splits/y_train.npy")
 
-    print(f"X_train shape: {X_train.shape}")
-    print(f"y_train shape: {y_train.shape}")
+    X_val = np.load("data/splits/X_val.npy")
+    y_val = np.load("data/splits/y_val.npy")
 
-    train_dataset = BearingDataset(X_train, y_train)
+    X_test = np.load("data/splits/X_test.npy")
+    y_test = np.load("data/splits/y_test.npy")
 
+    print(f"Train: {X_train.shape}")
+    print(f"Val  : {X_val.shape}")
+    print(f"Test : {X_test.shape}")
+
+    # Create datasets
+    train_dataset = BearingDataset(
+        X_train,
+        y_train
+    )
+
+    val_dataset = BearingDataset(
+        X_val,
+        y_val
+    )
+
+    test_dataset = BearingDataset(
+        X_test,
+        y_test
+    )
+
+    # Create data loaders
     train_loader = DataLoader(
         train_dataset,
         batch_size=BATCH_SIZE,
         shuffle=True
     )
 
-    model = CNN1D(NUM_CLASSES).to(DEVICE)
-
-    # Take one batch to verify the complete pipeline
-    X_batch, y_batch = next(iter(train_loader))
-
-    X_batch = X_batch.to(DEVICE)
-
-    with torch.no_grad():
-        output = model(X_batch)
-
-    print(f"Input batch shape : {X_batch.shape}")
-    print(f"Output shape      : {output.shape}")
-
-    total_params = sum(
-        p.numel() for p in model.parameters()
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False
     )
 
-    print(f"Total parameters  : {total_params:,}")
-    print("Baseline 1D-CNN forward pass successful.")
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False
+    )
+
+    # Create model
+    model = CNN1D(NUM_CLASSES).to(DEVICE)
+
+    total_params = sum(
+        p.numel()
+        for p in model.parameters()
+    )
+
+    print(f"Total parameters: {total_params:,}")
+    print("\nStarting training...\n")
+
+    # Train model
+    best_model_path, best_val_acc, training_time = train_model(
+        model,
+        train_loader,
+        val_loader
+    )
+
+    print("\nTraining completed.")
+    print(f"Best validation accuracy: {best_val_acc:.4f}")
+    print(f"Training time: {training_time:.2f} seconds")
+    print(f"Best model saved to: {best_model_path}")
 
 
 if __name__ == "__main__":
