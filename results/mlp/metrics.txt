@@ -1,0 +1,10 @@
+MLP/DNN Preliminary Results
+===========================
+Test Accuracy: 0.883642
+Macro Precision: 0.878741
+Macro Recall: 0.878915
+Macro F1: 0.878651
+Best Validation Accuracy: 0.898820
+Training Time: 23.20 seconds
+Inference Time: 0.0444 ms/sample
+Total Parameters: 295812
