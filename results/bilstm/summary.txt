@@ -1,0 +1,9 @@
+BiLSTM Results
+Test Accs: [1.0, 0.9932546374367622, 0.9966273187183811, 0.9949409780775716, 0.9966273187183811]
+Mean Acc: 0.996290
+Std Acc : 0.002237
+Avg Train Time (s): 103.990629
+Avg Inference Time (s/step, per batch): 0.00370881
+Best Run (by Test Acc): Run 1
+Best Run Test Acc: 1.000000
+Best Model Overall: models/bilstm/best_model_overall.pth
