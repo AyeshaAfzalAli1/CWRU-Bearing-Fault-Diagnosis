@@ -1,0 +1,49 @@
+{
+  "accuracy": 0.9966273187183811,
+  "macro_precision": 0.9965277777777778,
+  "macro_recall": 0.9965034965034965,
+  "macro_f1": 0.9964911848714666,
+  "total_parameters": 72388,
+  "trainable_parameters": 72388,
+  "test_samples": 593,
+  "training_seconds": 21.358059758000024,
+  "best_epoch": 6,
+  "best_validation_accuracy": 0.9949409780775716,
+  "training_timing_scope": "Epoch loop including data loading, transfers, forward/backward, optimizer updates, validation, checkpoint writes and logging; excludes setup, history CSV export, test evaluation and benchmarking.",
+  "inference": {
+    "device": "cuda",
+    "precision": "float32; AMP off; TF32 off",
+    "warmup_iterations": 10,
+    "repetitions": 50,
+    "timing_scope": "Model forward only on resident device tensor; excludes loading, host/device transfer, softmax and metrics. Each call synchronized.",
+    "input_selection": "First min(requested batch size, test count) clean test windows",
+    "single": {
+      "batch_size": 1,
+      "mean_batch_ms": 1.7630946800011316,
+      "median_batch_ms": 1.7087299999900551,
+      "p95_batch_ms": 1.9209060499946418,
+      "std_batch_ms": 0.16910180025858468,
+      "samples_per_second": 567.184514446699,
+      "amortized_ms_per_sample": 1.7630946800011316
+    },
+    "batch": {
+      "batch_size": 64,
+      "mean_batch_ms": 1.8987976000096296,
+      "median_batch_ms": 1.8742954999879657,
+      "p95_batch_ms": 2.1502023500175937,
+      "std_batch_ms": 0.13507852527049574,
+      "samples_per_second": 33705.540811551175,
+      "amortized_ms_per_sample": 0.029668712500150463
+    }
+  },
+  "protocol": "shared window-split baseline; no cross-load evaluation",
+  "metric_convention": "Fractions 0..1; all four labels; zero_division=0"
+}
+
+Class             Precision     Recall         F1  Support
+Normal             1.000000   1.000000   1.000000      166
+Ball               1.000000   1.000000   1.000000      142
+Inner Race         0.986111   1.000000   0.993007      142
+Outer Race         1.000000   0.986014   0.992958      143
+macro avg          0.996528   0.996503   0.996491      593
+weighted avg       0.996674   0.996627   0.996627      593

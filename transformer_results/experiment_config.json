@@ -1,0 +1,146 @@
+{
+  "config": {
+    "seed": 42,
+    "noise_seed": 2026,
+    "epochs": 30,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "benchmark_warmup": 10,
+    "benchmark_repeats": 50,
+    "model": {
+      "window_size": 1024,
+      "patch_size": 16,
+      "d_model": 64,
+      "nhead": 4,
+      "layers": 2,
+      "dim_feedforward": 128,
+      "dropout": 0.1
+    },
+    "normalization": "none",
+    "resampling": "none",
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss",
+    "selection": "highest validation accuracy; earliest tie",
+    "precision": "float32; AMP off; TF32 off",
+    "run_kind": "full shared baseline"
+  },
+  "data_dir": "/kaggle/input/datasets/suveeragarwala/cwru-dataset-transformer/splits",
+  "input_files": {
+    "X_train.npy": {
+      "sha256": "d35b291951ef00d092382820c71e54ba3cda61b8a16e31904484ec2858139d71",
+      "shape": [
+        4147,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    "y_train.npy": {
+      "sha256": "1d1f7cd661c1bafd886a8c0a672ab7b5ff0cc086c9ec6de4afe480913e9330c4",
+      "shape": [
+        4147
+      ],
+      "dtype": "int64",
+      "class_counts": [
+        1159,
+        996,
+        995,
+        997
+      ]
+    },
+    "X_val.npy": {
+      "sha256": "dbc1726f3c05d4043eae26bc56b0b95de7b7a239fccec1ff567f819c2dec60b8",
+      "shape": [
+        1186,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    "y_val.npy": {
+      "sha256": "a4e4ebb5b971dd1e8569a9ff4d3ba5df4a08e15d37ecad288e95850a6c49fa6e",
+      "shape": [
+        1186
+      ],
+      "dtype": "int64",
+      "class_counts": [
+        331,
+        285,
+        285,
+        285
+      ]
+    },
+    "X_test.npy": {
+      "sha256": "861f1996d07acd7d4883e76d5d2311d2dff590b14e057481a6859e62ff18509f",
+      "shape": [
+        593,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    "y_test.npy": {
+      "sha256": "9c5252e03c095c6390425f1ad4b3617fff612b834b523ec42a9d51ad0e13996c",
+      "shape": [
+        593
+      ],
+      "dtype": "int64",
+      "class_counts": [
+        166,
+        142,
+        142,
+        143
+      ]
+    }
+  },
+  "python": "3.12.13 (main, Mar  4 2026, 09:23:07) [GCC 11.4.0]",
+  "software_versions": {
+    "numpy": "2.0.2",
+    "torch": "2.10.0+cu128",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.0"
+  },
+  "hardware": {
+    "device": "cuda",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.35",
+    "processor": "x86_64",
+    "cpu_threads": 2,
+    "gpu": "Tesla T4",
+    "cuda_version": "12.8",
+    "cudnn_version": 91002
+  },
+  "utc_started": "2026-10-02T05:16:31.394114+00:00",
+  "deterministic_algorithms": true,
+  "data_protocol": "Shared stratified seed-42 window split: 70/20/10; no new partition.",
+  "limitations": "Recordings may overlap splits; no load metadata; not cross-load evaluation.",
+  "noise_protocol": "PCG64 seed=2026+SNR by default (configurable base); float64 standard_normal draws for full test shape in row order, per-window mean(x**2), additive noise; float32 output; zero-power inputs remain zero. No renormalization of realized noise.",
+  "training": {
+    "training_seconds": 21.358059758000024,
+    "best_epoch": 6,
+    "best_validation_accuracy": 0.9949409780775716,
+    "training_timing_scope": "Epoch loop including data loading, transfers, forward/backward, optimizer updates, validation, checkpoint writes and logging; excludes setup, history CSV export, test evaluation and benchmarking."
+  },
+  "inference": {
+    "device": "cuda",
+    "precision": "float32; AMP off; TF32 off",
+    "warmup_iterations": 10,
+    "repetitions": 50,
+    "timing_scope": "Model forward only on resident device tensor; excludes loading, host/device transfer, softmax and metrics. Each call synchronized.",
+    "input_selection": "First min(requested batch size, test count) clean test windows",
+    "single": {
+      "batch_size": 1,
+      "mean_batch_ms": 1.7630946800011316,
+      "median_batch_ms": 1.7087299999900551,
+      "p95_batch_ms": 1.9209060499946418,
+      "std_batch_ms": 0.16910180025858468,
+      "samples_per_second": 567.184514446699,
+      "amortized_ms_per_sample": 1.7630946800011316
+    },
+    "batch": {
+      "batch_size": 64,
+      "mean_batch_ms": 1.8987976000096296,
+      "median_batch_ms": 1.8742954999879657,
+      "p95_batch_ms": 2.1502023500175937,
+      "std_batch_ms": 0.13507852527049574,
+      "samples_per_second": 33705.540811551175,
+      "amortized_ms_per_sample": 0.029668712500150463
+    }
+  }
+}

@@ -1,0 +1,5 @@
+true_class,Normal,Ball,Inner Race,Outer Race
+Normal,166,0,0,0
+Ball,0,142,0,0
+Inner Race,0,0,142,0
+Outer Race,0,0,2,141
