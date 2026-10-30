@@ -1,0 +1,12 @@
+{
+  "val_loss_mean": 0.1713264190913568,
+  "val_loss_std": 0.01589051444223686,
+  "val_accuracy_mean": 0.9421023046655425,
+  "val_accuracy_std": 0.005614104653018048,
+  "val_precision_macro_mean": 0.9413982038463696,
+  "val_precision_macro_std": 0.006147915396703758,
+  "val_recall_macro_mean": 0.9397660818713449,
+  "val_recall_macro_std": 0.005840638700420477,
+  "val_f1_macro_mean": 0.9397438224045009,
+  "val_f1_macro_std": 0.00584655843001068
+}

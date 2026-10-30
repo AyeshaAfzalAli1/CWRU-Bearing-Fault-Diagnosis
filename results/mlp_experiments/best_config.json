@@ -1,0 +1,24 @@
+{
+  "trial_id": 37,
+  "hidden_dims": [
+    256,
+    128
+  ],
+  "dropout": 0.2,
+  "learning_rate": 0.001,
+  "weight_decay": 0.001,
+  "batch_size": 32,
+  "scheduler": "plateau",
+  "max_epochs": 60,
+  "patience": 8,
+  "preprocessing": "raw",
+  "best_epoch": 40,
+  "best_val_loss": 0.15775512504465186,
+  "best_val_accuracy": 0.9468802698145026,
+  "best_val_precision_macro": 0.9466642976949855,
+  "best_val_recall_macro": 0.9447368421052631,
+  "best_val_f1_macro": 0.9447125428318918,
+  "training_time_seconds": 51.74934899993241,
+  "parameter_count": 295812,
+  "status": "success"
+}

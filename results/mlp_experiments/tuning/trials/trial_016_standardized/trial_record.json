@@ -1,0 +1,36 @@
+{
+  "trial_id": 16,
+  "config": {
+    "hidden_dims": [
+      128,
+      64
+    ],
+    "dropout": 0.5,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "batch_size": 128,
+    "scheduler": "plateau",
+    "max_epochs": 60,
+    "patience": 8,
+    "preprocessing": "standardized"
+  },
+  "best_epoch": 60,
+  "best_validation": {
+    "loss": 0.37708323384818904,
+    "accuracy": 0.863406408094435,
+    "precision_macro": 0.8652169215091529,
+    "recall_macro": 0.8578947368421053,
+    "f1_macro": 0.8568769065487148,
+    "precision_weighted": 0.8703277709136312,
+    "recall_weighted": 0.863406408094435,
+    "f1_weighted": 0.8623695546937113
+  },
+  "training_time_seconds": 64.45232060016133,
+  "parameter_count": 139716,
+  "preprocessing_stats": {
+    "mode": "standardized",
+    "mean": 0.008410947397351265,
+    "std": 0.2995591163635254
+  },
+  "status": "success"
+}

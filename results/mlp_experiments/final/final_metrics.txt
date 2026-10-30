@@ -1,0 +1,14 @@
+MLP Final Metrics
+=================
+Device: cpu
+Best epoch: 40
+Test accuracy: 0.919056
+Macro precision: 0.917898
+Macro recall: 0.915715
+Macro F1: 0.915966
+Weighted precision: 0.919510
+Weighted recall: 0.919056
+Weighted F1: 0.918460
+Training time seconds: 115.49
+Mean inference ms/sample: 0.049745
+Checkpoint: C:\Users\Aparna Karanth\Desktop\DL_Project\CWRU-Bearing-Fault-Diagnosis\results\mlp_experiments\final\best_model.pth

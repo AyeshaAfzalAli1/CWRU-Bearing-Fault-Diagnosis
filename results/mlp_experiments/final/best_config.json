@@ -1,0 +1,14 @@
+{
+  "hidden_dims": [
+    256,
+    128
+  ],
+  "dropout": 0.2,
+  "learning_rate": 0.001,
+  "weight_decay": 0.001,
+  "batch_size": 32,
+  "scheduler": "plateau",
+  "max_epochs": 60,
+  "patience": 8,
+  "preprocessing": "raw"
+}
