@@ -1,0 +1,13 @@
+Regularized MLP Results
+=======================
+Test Accuracy: 0.927487
+Macro Precision: 0.929016
+Macro Recall: 0.924431
+Macro F1: 0.925105
+Best Validation Accuracy: 0.946037
+Training Time: 10.69 seconds
+Inference Time: 0.0034 ms/sample
+Total Parameters: 140100
+Final Train-Validation Accuracy Gap: -0.001499
+Stopped Epoch: 40
+Best Epoch by Validation Loss: 36

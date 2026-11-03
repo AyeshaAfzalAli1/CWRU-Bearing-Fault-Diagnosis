@@ -1,0 +1,17 @@
+Device: cpu
+Timing method: model.eval(), torch.no_grad(), test set preloaded on device, batch size 128, 10 warmup passes, 50 timed passes, device synchronization before/after.
+
+Regularized MLP
+Mean ms/sample: 0.017973
+Std ms/sample: 0.005982
+Median ms/sample: 0.016171
+P95 ms/sample: 0.028134
+
+Original MLP
+Mean ms/sample: 0.014141
+Std ms/sample: 0.001609
+Median ms/sample: 0.013727
+P95 ms/sample: 0.016439
+
+CNN
+Skipped: checkpoint not found.
